@@ -1,28 +1,19 @@
 @echo off
-title GDI Flashing Fake OS
-mode con: cols=80 lines=25
+title RGBQUAD GDI Color Simulator
 
-:: Try to make the window full-screen
-powershell -command "& {Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('{F11}')}" 2>nul
-
-:: Disable echo and clear screen
-cls
-
+:: Simulate a full screen RGB fill using PowerShell
 :loop
-color 1F
-cls
-echo.
-echo            ████████  FAKE OS BOOT SEQUENCE ████████
-echo.
-echo               Simulating GDI Flashing Screen
-echo               Press CTRL+C to exit at any time.
-timeout /nobreak /t 1 >nul
+set /p r=Enter RED value (0-255): 
+set /p g=Enter GREEN value (0-255): 
+set /p b=Enter BLUE value (0-255): 
 
-color 4F
-cls
-echo.
-echo            ████████  FAKE OS WARNING ████████
-echo.
-echo               ERROR 0x0000FF: SCREEN RENDER FAILURE
-echo               Press CTRL+C to exit at any time.
-timeout /
+:: Launch PowerShell to draw a fullscreen window with that color
+powershell -NoProfile -Command ^
+"[void][Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); ^
+$form = New-Object Windows.Forms.Form; ^
+$form.WindowState = 'Maximized'; ^
+$form.BackColor = [System.Drawing.Color]::FromArgb(%r%,%g%,%b%); ^
+$form.TopMost = $true; ^
+$form.ShowDialog()"
+
+goto loop
